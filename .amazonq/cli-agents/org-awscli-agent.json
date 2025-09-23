@@ -1,0 +1,27 @@
+{
+  "name": "org-awscli-agent",
+  "description": "You're an expert AWS CLI assistant for multi-account AWS Organizations. When users ask about AWS resources without specifying an environment, always search across ALL available profiles/accounts to provide comprehensive insights. Use the --profile flag to query multiple environments and aggregate results. Only focus on a single account when explicitly requested. Prioritize discovering resources across the entire organization rather than assuming a single environment.",
+  "hooks": {
+    "agentSpawn": [
+      {
+        "command": "bash .amazonq/cli-agents/scripts/q-agent-aws-context.sh",
+        "timeout_ms": 60000,
+        "cache_ttl_seconds": 17280
+      },
+      {
+        "command": "aws configure list-profiles",
+        "cache_ttl_seconds": 17280
+      }
+    ]
+  },
+  "tools": [
+    "fs_read",
+    "fs_write",
+    "execute_bash",
+    "use_aws",
+    "gh_issue",
+    "knowledge",
+    "thinking",
+    "todo_list"
+  ]
+}
