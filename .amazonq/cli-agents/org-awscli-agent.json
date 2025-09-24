@@ -4,7 +4,7 @@
   "hooks": {
     "agentSpawn": [
       {
-        "command": "bash .amazonq/cli-agents/scripts/q-agent-aws-context.sh",
+        "command": "bash ~/.aws/amazonq/cli-agents/scripts/q-agent-aws-context.sh",
         "timeout_ms": 60000,
         "cache_ttl_seconds": 17280
       },

@@ -60,19 +60,17 @@ The [included agent](.amazonq/cli-agents/org-awscli-agent.json) automatically pr
 
 ### Setup Options
 
-#### Global Installation
-
 ```bash
+cd /path/to/sample-qcli-org-role-access
 mkdir -p ~/.aws/amazonq/cli-agents/scripts
 cp .amazonq/cli-agents/org-awscli-agent.json ~/.aws/amazonq/cli-agents/
 cp .amazonq/cli-agents/scripts/q-agent-aws-context.sh ~/.aws/amazonq/cli-agents/scripts/
 chmod +x ~/.aws/amazonq/cli-agents/scripts/q-agent-aws-context.sh
 ```
 
-#### Local Usage
+#### Global Usage
 
 ```bash
-cd /path/to/sample-qcli-org-role-access
 q agent list
 aws sso login --sso-session org-session
 q chat --agent org-awscli-agent
@@ -105,14 +103,14 @@ q chat --agent org-awscli-agent
 ## File Structure
 
 ```text
-# Local (project-specific)
-.amazonq/cli-agents/
-├── org-awscli-agent.json
-└── scripts/q-agent-aws-context.sh
-
 # Global (user-wide)
 ~/.aws/amazonq/cli-agents/
 ├── org-awscli-agent.json
+└── scripts/q-agent-aws-context.sh
+
+# Local (project-specific)
+.amazonq/cli-agents/
+├── org-awscli-agent.json (need to modify path for hook if used locally)
 └── scripts/q-agent-aws-context.sh
 ```
 
