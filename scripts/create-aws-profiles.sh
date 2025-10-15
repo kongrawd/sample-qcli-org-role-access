@@ -15,21 +15,22 @@
 
 ROLE_NAME="$1"
 SSO_SESSION="${2:-myorg}"
+SSO_REGION=${3:-ap-southeast-1}
 
 show_usage() {
-    echo "Usage: $0 <ROLE_NAME> [SSO_SESSION]"
+    echo "Usage: $0 <ROLE_NAME> [SSO_SESSION] [SSO_REGION]"
     echo ""
     echo "Arguments:"
     echo "  ROLE_NAME    The role name to create profiles for (required)"
     echo "  SSO_SESSION  The SSO session name to use (optional, defaults to 'myorg')"
+    echo "  SSO_REGION   The SSO region to use (optional, defaults to 'ap-southeast-1')"
     echo ""
     echo "Examples:"
     echo "  $0 DBA"
     echo "  $0 DBA my-company-sso"
-    echo "  $0 ReadOnlyAccess prod-session"
+    echo "  $0 ReadOnlyAccess myorg ap-southeast-1"
     echo ""
     echo "To find available SSO sessions, check your ~/.aws/config file for [sso-session <name>] entries"
-    echo "Or run: grep '\\[sso-session' ~/.aws/config"
 }
 
 if [ -z "$ROLE_NAME" ]; then
@@ -77,7 +78,7 @@ fi
 
 # Get all accounts using access token
 echo "Fetching account list..."
-accounts_json=$(aws sso list-accounts --access-token "$ACCESS_TOKEN" --query 'accountList[].{id:accountId,name:accountName}' --output json 2>/dev/null)
+accounts_json=$(aws sso list-accounts --access-token "$ACCESS_TOKEN" --query 'accountList[].{id:accountId,name:accountName}' --region "$SSO_REGION" --output json 2>/dev/null)
 
 if [ -z "$accounts_json" ] || [ "$accounts_json" = "null" ]; then
     echo "Error: Failed to fetch accounts. Please login again:"
@@ -88,7 +89,7 @@ fi
 echo "$accounts_json" | jq -r '.[] | "\(.id) \(.name)"' | \
 while read -r account_id account_name; do
     # Check if role exists in this account using access token
-    if aws sso list-account-roles --account-id "$account_id" --access-token "$ACCESS_TOKEN" --query "roleList[?roleName=='$ROLE_NAME'].roleName" --output text 2>/dev/null | grep -q "$ROLE_NAME"; then
+    if aws sso list-account-roles --account-id "$account_id" --access-token "$ACCESS_TOKEN" --query "roleList[?roleName=='$ROLE_NAME'].roleName" --region "$SSO_REGION" --output text 2>/dev/null | grep -q "$ROLE_NAME"; then
         # Create profile name: SSO session + lowercase account name + original role name
         account_name_lower=$(echo "$account_name" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
         profile_name="${SSO_SESSION}-${account_name_lower}-${ROLE_NAME}"
