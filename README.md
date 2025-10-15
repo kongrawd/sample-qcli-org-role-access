@@ -27,7 +27,7 @@ This sample proposes a solution on using agent hooks in pre-generate all necessa
 
 ### 1. Configure SSO Session
 
-For the first time, set up an SSO session in your AWS config using your organization's SSO start URL and region through the command `aws configure sso`.
+For the first time, set up an SSO session in your AWS config using your organization's SSO start URL and region through the command `aws configure sso-session`.
 
 In your `~/.aws/config`, you should have:
 
