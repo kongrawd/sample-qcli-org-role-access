@@ -32,7 +32,7 @@ For the first time, set up an SSO session in your AWS config using your organiza
 In your `~/.aws/config`, you should have:
 
 ```ini
-[sso-session org-session]
+[sso-session myorg]
 sso_start_url = https://company.awsapps.com/start
 sso_region = eu-central-1
 sso_registration_scopes = sso:account:access
@@ -41,17 +41,17 @@ sso_registration_scopes = sso:account:access
 ### 2. Generate Profiles
 
 ```bash
-aws sso login --sso-session org-session
-./scripts/create-aws-profiles.sh DBAReadOnly org-session
+aws sso login --sso-session myorg
+./scripts/create-aws-profiles.sh DBAReadOnly myorg
 ```
 
 ### 3. Test Access
 
 ```bash
-# Profiles follow format: <account-name>-<RoleName>
+# Profiles follow format: <sso-session>-<account-name>-<RoleName>
 aws configure list-profiles
-aws s3 ls --profile workload-DBAReadOnly
-aws ec2 describe-instances --profile development-DBAReadOnly
+aws s3 ls --profile myorg-workload-DBAReadOnly
+aws ec2 describe-instances --profile myorg-development-DBAReadOnly
 ```
 
 ## Amazon Q CLI Integration
@@ -72,7 +72,7 @@ chmod +x ~/.aws/amazonq/cli-agents/scripts/q-agent-aws-context.sh
 
 ```bash
 q agent list
-aws sso login --sso-session org-session
+aws sso login --sso-session myorg
 q chat --agent org-awscli-agent
 ```
 
@@ -91,7 +91,7 @@ q chat --agent org-awscli-agent
 ```
 
 - `ROLE_NAME`: IAM role name to create profiles for (required)
-- `SSO_SESSION`: SSO session name (optional, defaults to 'org-session')
+- `SSO_SESSION`: SSO session name (optional, defaults to 'myorg')
 
 **Features:**
 

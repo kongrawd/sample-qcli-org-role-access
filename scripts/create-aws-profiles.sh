@@ -7,21 +7,21 @@
 # - Gracefully handles accounts where the role doesn't exist (skips with message)
 # - Prevents duplicate profiles when re-running the script
 # - Validates SSO session exists before proceeding
-# - Uses lowercase account names with original role names for profile naming (e.g., "myaccount-DBAReadOnly")
+# - Uses SSO session name, lowercase account names, and original role names for profile naming (e.g., "myorg-myaccount-DBAReadOnly")
 #
 # Example usage:
 # ./create-aws-profiles.sh DBA
 # ./create-aws-profiles.sh DBAReadOnly my-sso-session
 
 ROLE_NAME="$1"
-SSO_SESSION="${2:-org-session}"
+SSO_SESSION="${2:-myorg}"
 
 show_usage() {
     echo "Usage: $0 <ROLE_NAME> [SSO_SESSION]"
     echo ""
     echo "Arguments:"
     echo "  ROLE_NAME    The role name to create profiles for (required)"
-    echo "  SSO_SESSION  The SSO session name to use (optional, defaults to 'org-session')"
+    echo "  SSO_SESSION  The SSO session name to use (optional, defaults to 'myorg')"
     echo ""
     echo "Examples:"
     echo "  $0 DBA"
@@ -89,9 +89,9 @@ echo "$accounts_json" | jq -r '.[] | "\(.id) \(.name)"' | \
 while read -r account_id account_name; do
     # Check if role exists in this account using access token
     if aws sso list-account-roles --account-id "$account_id" --access-token "$ACCESS_TOKEN" --query "roleList[?roleName=='$ROLE_NAME'].roleName" --output text 2>/dev/null | grep -q "$ROLE_NAME"; then
-        # Create profile name: lowercase account name + original role name
+        # Create profile name: SSO session + lowercase account name + original role name
         account_name_lower=$(echo "$account_name" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
-        profile_name="${account_name_lower}-${ROLE_NAME}"
+        profile_name="${SSO_SESSION}-${account_name_lower}-${ROLE_NAME}"
         
         # Skip if profile already exists with correct configuration
         if aws configure get sso_account_id --profile "$profile_name" 2>/dev/null | grep -q "$account_id"; then
